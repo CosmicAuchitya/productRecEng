@@ -29,7 +29,8 @@ export const CONFIG = {
 
   // --- API CONNECTION ---
   FRONTEND_PORT: 5173,
-  API_BASE: import.meta.env.VITE_API_BASE || 'http://localhost:8000',
+  // FIX: Changed VITE_API_BASE to VITE_API_URL to match your Vercel Config
+  API_BASE: import.meta.env.VITE_API_URL || 'http://localhost:8000',
 };
 
 export default CONFIG;
