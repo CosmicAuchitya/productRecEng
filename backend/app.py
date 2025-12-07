@@ -15,11 +15,14 @@ from utils import (
 
 app = FastAPI(title="Product Recommender API")
 
-# CORS Setup
+# --- FIX START: Explicitly allow your Vercel Domain ---
 origins = [
-    os.getenv("FRONTEND_URL", "http://localhost:5173"),
+    "http://localhost:5173",                 # Local testing ke liye
     "http://localhost:3000",
+    "https://product-rec-eng.vercel.app",    # <-- AAPKA VERCEL FRONTEND
+    "https://product-rec-eng.vercel.app/"    # <-- Slash ke sath bhi safe side ke liye
 ]
+# ------------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,7 +34,6 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    # Trigger lazy load or just log
     print("API Starting up. Artifacts will be loaded on first request.")
 
 @app.get("/health")
@@ -40,10 +42,8 @@ def health():
 
 @app.get("/meta/products")
 def get_product_catalog():
-    """Returns a lightweight catalog for typeahead/search."""
     load_artifacts()
     if not ARTIFACTS["catalog_list"]:
-        # Fallback empty list instead of 503 to prevent frontend crash
         return []
     return ARTIFACTS["catalog_list"][:2000]
 
@@ -56,12 +56,7 @@ def get_product_details(product_id: str):
 
 @app.get("/product/live_price/{product_id}")
 def get_live_price(product_id: str):
-    """
-    Amazon se live price check karke return karta hai.
-    """
     price = scrape_amazon_price(product_id)
-    
-    # Fallback to cached price if scraping fails
     meta = get_product_meta(product_id)
     cached_price = meta.get('discounted_price') if meta else 0
     
