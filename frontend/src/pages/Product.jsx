@@ -44,10 +44,19 @@ export default function Product() {
     setCheckingPrice(true);
     try {
       const res = await axios.get(`${CONFIG.API_BASE}/product/live_price/${id}`);
-      setLivePrice(res.data.price);
-      setPriceStatus(res.data.status);
+      const { price, status } = res.data; // Backend se status aur price dono le rahe hain
+
+      setLivePrice(price); // Price hamesha update karo (chahe cached ho)
+      setPriceStatus(status);
+      
+      if (status === 'cached') {
+        // Honest message jab scraper fail ho jaye
+        alert("लाइव प्राइस अपडेट नहीं हो सका। (संभवतः Amazon ने अनुरोध ब्लॉक कर दिया)। पुराना (cached) मूल्य दिखाया जा रहा है।");
+      }
+      
     } catch (err) {
-      alert("Could not connect to Amazon right now. Showing last known price.");
+      // Jab pura connection hi fail ho jaye
+      alert("अमेज़न या सर्वर से कनेक्ट नहीं हो सका। कृपया बाद में प्रयास करें।");
     } finally {
       setCheckingPrice(false);
     }
