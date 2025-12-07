@@ -1,5 +1,4 @@
 // frontend/src/components/AboutSection.jsx
-import { CONFIG } from '../config';
 import { motion } from 'framer-motion';
 
 export default function AboutSection() {
@@ -16,7 +15,7 @@ export default function AboutSection() {
             transition={{ duration: 0.6 }}
           >
             <span className="text-indigo-600 font-bold tracking-widest uppercase text-sm">The Developer</span>
-            <h2 className="text-4xl font-extrabold text-gray-900 mt-2 mb-6">Hi, I'm Abhigya.</h2>
+            <h2 className="text-4xl font-extrabold text-gray-900 mt-2 mb-6">Hi, I'm Auchitya Singh.</h2>
             <div className="text-lg text-gray-600 leading-relaxed space-y-4">
               <p>
                 I am an aspiring <strong>Data Scientist</strong> with a relentless drive to solve real-world problems through data. 
