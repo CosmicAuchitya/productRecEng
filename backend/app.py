@@ -15,22 +15,16 @@ from utils import (
 
 app = FastAPI(title="Product Recommender API")
 
-# --- FIX START: Explicitly allow your Vercel Domain ---
-origins = [
-    "http://localhost:5173",                 # Local testing ke liye
-    "http://localhost:3000",
-    "https://product-rec-eng.vercel.app",    # <-- AAPKA VERCEL FRONTEND
-    "https://product-rec-eng.vercel.app/"    # <-- Slash ke sath bhi safe side ke liye
-]
-# ------------------------------------------------------
-
+# --- FIX START: Allow ALL Origins (Sabko Allow Karein) ---
+# Ye 'Nuclear Option' hai jo CORS error ko jad se khatam kar dega.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Sare domains allow kar diye
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Sare methods (GET, POST, OPTIONS) allow
+    allow_headers=["*"],  # Sare headers allow
 )
+# ---------------------------------------------------------
 
 @app.on_event("startup")
 async def startup_event():
