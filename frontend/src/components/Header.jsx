@@ -3,7 +3,19 @@ import { Link } from 'react-router-dom';
 import { CONFIG } from '../config';
 import { FaCube } from 'react-icons/fa';
 
-export default function Header() {
+export default function Header({ onContactClick }) {
+  
+  const handleScrollToAbout = (e) => {
+    e.preventDefault();
+    const element = document.getElementById('about');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // If we are not on home page, go home first then scroll
+      window.location.href = '/#about';
+    }
+  };
+
   return (
     <header className="absolute top-0 left-0 right-0 z-50 py-6">
       <div className="container mx-auto px-6 flex justify-between items-center">
@@ -22,8 +34,8 @@ export default function Header() {
         
         <nav className="hidden md:flex space-x-8 text-white/90 font-medium text-sm uppercase tracking-widest">
           <Link to="/" className="hover:text-white transition-colors">Home</Link>
-          <a href="#about" className="hover:text-white transition-colors">About</a>
-          <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+          <a href="#about" onClick={handleScrollToAbout} className="hover:text-white transition-colors cursor-pointer">About Project</a>
+          <button onClick={onContactClick} className="hover:text-white transition-colors uppercase tracking-widest">Contact</button>
         </nav>
       </div>
     </header>
