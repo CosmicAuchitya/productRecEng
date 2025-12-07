@@ -1,14 +1,12 @@
 // frontend/src/pages/Home.jsx
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CONFIG } from '../config';
 import SearchBar from '../components/SearchBar';
 import RecommendationGrid from '../components/RecommendationGrid';
 import ThreeLogoScene from '../components/ThreeLogoScene';
 import axios from 'axios';
-
-// NOTE: AboutSection removed from here
 
 export default function Home() {
   const [recommendations, setRecommendations] = useState([]);
@@ -16,6 +14,7 @@ export default function Home() {
   const [seedProduct, setSeedProduct] = useState(null);
   
   const location = useLocation();
+  const navigate = useNavigate();
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 200]); 
 
@@ -45,8 +44,12 @@ export default function Home() {
       });
       setRecommendations(res.data.recommendations);
       
+      // Auto scroll to results after a short delay to ensure render
       setTimeout(() => {
-        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const resultsEl = document.getElementById('results');
+        if (resultsEl) {
+          resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }, 100);
       
     } catch (err) {
@@ -54,6 +57,11 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handler for quick search tags
+  const handleQuickSearch = (term) => {
+    navigate(`/?q=${encodeURIComponent(term)}`);
   };
 
   return (
@@ -90,11 +98,26 @@ export default function Home() {
               AI-driven recommendations tailored to your taste. 
               Analyze sentiment, compare prices, and find the best deals instantly.
             </p>
+            
             <div className="pt-4">
-              <SearchBar onSearch={(q) => window.location.href = `/?q=${encodeURIComponent(q)}`} />
-              <div className="mt-4 text-sm text-gray-400">
-                Try searching for: 
-                <span className="text-white ml-1">iPhone Case, Headphones</span>
+              <SearchBar onSearch={(q) => navigate(`/?q=${encodeURIComponent(q)}`)} />
+              
+              <div className="mt-4 text-sm text-gray-400 flex items-center">
+                <span>Try searching for:</span> 
+                {/* FIX: Made these clickable buttons again */}
+                <button 
+                  onClick={() => handleQuickSearch('iPhone Case')}
+                  className="ml-2 text-white underline decoration-dotted hover:text-indigo-400 transition-colors cursor-pointer"
+                >
+                  iPhone Case
+                </button>
+                <span className="mx-1">,</span>
+                <button 
+                  onClick={() => handleQuickSearch('Headphones')}
+                  className="text-white underline decoration-dotted hover:text-indigo-400 transition-colors cursor-pointer"
+                >
+                  Headphones
+                </button>
               </div>
             </div>
           </motion.div>
@@ -103,10 +126,24 @@ export default function Home() {
             <ThreeLogoScene />
           </div>
         </div>
+        
+        {/* Scroll Indicator */}
+        <motion.div 
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/50 cursor-pointer z-20"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          onClick={() => {
+            const resultsEl = document.getElementById('results');
+            if (resultsEl) resultsEl.scrollIntoView({ behavior: 'smooth'});
+          }}
+        >
+          <span className="text-sm uppercase tracking-widest">Scroll to Explore</span>
+        </motion.div>
       </div>
 
       {/* --- RECOMMENDATIONS SECTION --- */}
-      {recommendations.length > 0 && (
+      {/* Logic: Show loading OR if we have recommendations. Otherwise hide to keep Hero clean */}
+      {(loading || recommendations.length > 0) && (
         <div id="results" className="container mx-auto px-6 py-20 min-h-[50vh]">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-4">
