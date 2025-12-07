@@ -1,12 +1,16 @@
-import { useEffect } from 'react';
+// frontend/src/App.jsx
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Product from './pages/Product';
 import Header from './components/Header';
+import ContactDrawer from './components/ContactDrawer';
 import { CONFIG } from './config';
 
 function App() {
-  // Inject config colors as CSS variables for Tailwind to pick up
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
+  // Inject config colors
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--color-primary', CONFIG.THEME.primary);
@@ -15,9 +19,13 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col font-sans">
-        {/* Navigation Header */}
-        <Header />
+      <div className="min-h-screen flex flex-col font-sans relative">
+        
+        {/* Contact Slide-Over */}
+        <ContactDrawer isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
+
+        {/* Navigation Header with Contact Trigger */}
+        <Header onContactClick={() => setIsContactOpen(true)} />
         
         {/* Page Content */}
         <main className="flex-grow">
@@ -30,7 +38,7 @@ function App() {
         {/* Footer */}
         <footer className="bg-slate-900 text-slate-400 py-8 mt-auto">
           <div className="container mx-auto px-6 text-center">
-            <p className="text-sm">© {new Date().getFullYear()} RecEngine Premium. Powered by AI.</p>
+            <p className="text-sm">© {new Date().getFullYear()} RecEngine Premium. Built with passion by Abhigya.</p>
           </div>
         </footer>
       </div>
