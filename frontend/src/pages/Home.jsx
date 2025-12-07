@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+// frontend/src/pages/Home.jsx
+import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { CONFIG } from '../config';
 import SearchBar from '../components/SearchBar';
 import RecommendationGrid from '../components/RecommendationGrid';
 import ThreeLogoScene from '../components/ThreeLogoScene';
+import AboutSection from '../components/AboutSection';
 import axios from 'axios';
 
 export default function Home() {
@@ -13,14 +15,28 @@ export default function Home() {
   
   // Parallax Effect Logic
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]); // Moves background slower than foreground
+  const y1 = useTransform(scrollY, [0, 500], [0, 200]); 
+
+  // Check URL params for shared search queries
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    if (q) fetchRecommendations(q);
+    
+    // Handle hash scroll for #about if loaded directly
+    if (window.location.hash === '#about') {
+      setTimeout(() => {
+        document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
+  }, []);
 
   // Helper to fetch recommendations
   const fetchRecommendations = async (query) => {
     setLoading(true);
     try {
       const res = await axios.get(`${CONFIG.API_BASE}/recommend/by_name`, {
-        params: { q: query, top_n: 8 } // Fetch 8 for a nice grid
+        params: { q: query, top_n: 8 } 
       });
       setSeedProduct({
         id: res.data.seed_product_id,
@@ -30,24 +46,16 @@ export default function Home() {
       setRecommendations(res.data.recommendations);
     } catch (err) {
       console.error(err);
-      // Optional: Add toast notification here
     } finally {
       setLoading(false);
     }
   };
 
-  // Check URL params for shared search queries
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get('q');
-    if (q) fetchRecommendations(q);
-  }, []);
-
   return (
     <div className="bg-gray-50">
       
       {/* --- HERO SECTION --- */}
-      <div className="relative h-[85vh] w-full overflow-hidden flex items-center justify-center">
+      <div className="relative h-[95vh] w-full overflow-hidden flex items-center justify-center">
         
         {/* Background Image with Parallax */}
         <motion.div 
@@ -56,7 +64,7 @@ export default function Home() {
         >
           <img 
             src={CONFIG.HERO_IMAGE} 
-            onError={(e) => e.target.style.display = 'none'} // Hide if missing, background color fallback
+            onError={(e) => e.target.style.display = 'none'} 
             alt="Hero Background" 
             className="w-full h-full object-cover"
           />
@@ -103,9 +111,10 @@ export default function Home() {
         
         {/* Scroll Indicator */}
         <motion.div 
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/50"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/50 cursor-pointer"
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
+          onClick={() => document.getElementById('results').scrollIntoView({ behavior: 'smooth'})}
         >
           <span className="text-sm uppercase tracking-widest">Scroll to Explore</span>
         </motion.div>
@@ -137,10 +146,13 @@ export default function Home() {
           </motion.div>
         ) : (
           <div className="text-center py-20 text-gray-400">
-            <p className="text-xl">Search for a product to see AI recommendations.</p>
+            <p className="text-xl">Search for a product above to see AI recommendations.</p>
           </div>
         )}
       </div>
+
+      {/* --- ABOUT SECTION --- */}
+      <AboutSection />
 
     </div>
   );
