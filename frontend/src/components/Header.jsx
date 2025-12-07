@@ -1,26 +1,27 @@
 // frontend/src/components/Header.jsx
-import { Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CONFIG } from '../config';
 import { FaCube } from 'react-icons/fa';
 
-export default function Header({ onContactClick }) {
-  
-  const handleScrollToAbout = (e) => {
+export default function Header({ onContactClick, onAboutClick }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleHomeClick = (e) => {
     e.preventDefault();
-    const element = document.getElementById('about');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate('/'); 
     } else {
-      // If we are not on home page, go home first then scroll
-      window.location.href = '/#about';
+      navigate('/');
     }
   };
-
+  
   return (
     <header className="absolute top-0 left-0 right-0 z-50 py-6">
       <div className="container mx-auto px-6 flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2 group">
-          {/* Logo Icon */}
+        {/* Logo */}
+        <a href="/" onClick={handleHomeClick} className="flex items-center space-x-2 group cursor-pointer">
           <div 
             className="w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110"
             style={{ backgroundColor: CONFIG.THEME.primary }}
@@ -30,11 +31,14 @@ export default function Header({ onContactClick }) {
           <span className="text-2xl font-extrabold text-white tracking-tight drop-shadow-md">
             Rec<span style={{ color: CONFIG.THEME.primary }}>Engine</span>
           </span>
-        </Link>
+        </a>
         
         <nav className="hidden md:flex space-x-8 text-white/90 font-medium text-sm uppercase tracking-widest">
-          <Link to="/" className="hover:text-white transition-colors">Home</Link>
-          <a href="#about" onClick={handleScrollToAbout} className="hover:text-white transition-colors cursor-pointer">About Project</a>
+          <button onClick={handleHomeClick} className="hover:text-white transition-colors cursor-pointer uppercase tracking-widest">Home</button>
+          
+          {/* Now triggers the Drawer instead of Scroll */}
+          <button onClick={onAboutClick} className="hover:text-white transition-colors cursor-pointer uppercase tracking-widest">About Project</button>
+          
           <button onClick={onContactClick} className="hover:text-white transition-colors uppercase tracking-widest">Contact</button>
         </nav>
       </div>
