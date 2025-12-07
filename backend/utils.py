@@ -155,6 +155,7 @@ def find_best_match(query):
 def recommend_for_seed(seed_id, top_n=10):
     load_artifacts()
     
+    # 1. Fast Path: CSV
     if ARTIFACTS["all_recs_df"] is not None:
         df = ARTIFACTS["all_recs_df"]
         subset = df[df['seed_product_id'] == seed_id].sort_values('rank').head(top_n)
@@ -169,6 +170,7 @@ def recommend_for_seed(seed_id, top_n=10):
                 recs.append(r)
             return recs
 
+    # 2. Slow Path: On-demand NN
     _ensure_models_loaded()
     nn = ARTIFACTS["nn_model"]
     matrix = ARTIFACTS["tfidf_matrix"]
@@ -179,6 +181,7 @@ def recommend_for_seed(seed_id, top_n=10):
 
     seed_idx = idx_map[seed_id]
     distances, indices = nn.kneighbors(matrix[seed_idx], n_neighbors=top_n + 5)
+    
     distances = distances.flatten()
     indices = indices.flatten()
     
@@ -210,22 +213,35 @@ def recommend_for_seed(seed_id, top_n=10):
     candidates.sort(key=lambda x: x['final_score'], reverse=True)
     return candidates[:top_n]
 
+# --- HONEST SCRAPER IMPLEMENTATION ---
 def scrape_amazon_price(product_id):
     """
-    Live Amazon Page se price fetch karta hai using simple requests.
+    Attempts to fetch REAL price from Amazon.
+    Returns None if blocked by Amazon (Security).
+    No fake data.
     """
     url = f"https://www.amazon.in/dp/{product_id}"
+    
+    # Headers to mimic a real browser request
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Referer": "https://www.amazon.in/"
     }
 
     try:
-        response = requests.get(url, headers=headers, timeout=5)
+        # Use session for better connection handling
+        session = requests.Session()
+        response = session.get(url, headers=headers, timeout=5)
+        
+        # 503 is typical 'Service Unavailable' when Amazon blocks bots
         if response.status_code != 200:
+            logger.warning(f"Amazon Blocked/Failed with status: {response.status_code}")
             return None
         
         soup = BeautifulSoup(response.content, "html.parser")
+        
         # Try multiple common selectors for price on Amazon
         selectors = ['.a-price-whole', '#priceblock_ourprice', '#priceblock_dealprice', '.a-price .a-offscreen']
         
@@ -238,5 +254,5 @@ def scrape_amazon_price(product_id):
             
         return None
     except Exception as e:
-        logger.warning(f"Scraping failed for {product_id}: {e}")
+        logger.warning(f"Scraping exception for {product_id}: {e}")
         return None
