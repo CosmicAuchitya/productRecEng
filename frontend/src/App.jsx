@@ -38,7 +38,7 @@ function App() {
         {/* Footer */}
         <footer className="bg-slate-900 text-slate-400 py-8 mt-auto">
           <div className="container mx-auto px-6 text-center">
-            <p className="text-sm">© {new Date().getFullYear()} RecEngine Premium. Built with passion by Abhigya.</p>
+            <p className="text-sm">© {new Date().getFullYear()} RecEngine Premium. Built with passion by Auchitya Singh.</p>
           </div>
         </footer>
       </div>
