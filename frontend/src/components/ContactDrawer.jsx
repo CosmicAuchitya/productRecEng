@@ -1,7 +1,6 @@
 // frontend/src/components/ContactDrawer.jsx
 import { useEffect } from 'react';
-import { FaTimes, FaLinkedin, FaEnvelope, FaGithub } from 'react-icons/fa';
-import { CONFIG } from '../config';
+import { FaTimes, FaLinkedin, FaEnvelope } from 'react-icons/fa'; // FaGithub hata diya
 
 export default function ContactDrawer({ isOpen, onClose }) {
   // Disable body scroll when drawer is open
@@ -50,35 +49,24 @@ export default function ContactDrawer({ isOpen, onClose }) {
             <div className="space-y-6 mt-8">
               
               {/* Email */}
-              <a href="mailto:abhigya@example.com" className="flex items-center p-4 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors group">
+              <a href="mailto:auchityasingh86@gmail.com" className="flex items-center p-4 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors group">
                 <div className="w-12 h-12 bg-indigo-600 text-white rounded-lg flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                   <FaEnvelope />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Email Me</p>
-                  <p className="text-gray-900 font-semibold">abhigya@example.com</p>
+                  <p className="text-gray-900 font-semibold break-all">auchityasingh86@gmail.com</p>
                 </div>
               </a>
 
               {/* LinkedIn */}
-              <a href="https://linkedin.com/in/your-profile" target="_blank" rel="noreferrer" className="flex items-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group">
+              <a href="https://www.linkedin.com/in/auchitya-singh-7b42502a5/" target="_blank" rel="noreferrer" className="flex items-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group">
                 <div className="w-12 h-12 bg-[#0077b5] text-white rounded-lg flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
                   <FaLinkedin />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Connect on LinkedIn</p>
-                  <p className="text-gray-900 font-semibold">Abhigya (Data Scientist)</p>
-                </div>
-              </a>
-
-              {/* GitHub */}
-              <a href="https://github.com/your-username" target="_blank" rel="noreferrer" className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group">
-                <div className="w-12 h-12 bg-gray-900 text-white rounded-lg flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                  <FaGithub />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Check My Code</p>
-                  <p className="text-gray-900 font-semibold">github.com/Abhigya</p>
+                  <p className="text-gray-900 font-semibold">Auchitya Singh</p>
                 </div>
               </a>
 
